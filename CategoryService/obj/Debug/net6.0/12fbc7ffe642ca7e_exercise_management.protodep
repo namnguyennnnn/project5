@@ -1,0 +1,3 @@
+obj\Debug\net6.0\Protos/ExerciseManagement.cs \
+obj\Debug\net6.0\Protos/ExerciseManagementGrpc.cs: C:/Users/namng/.nuget/packages/grpc.tools/2.58.0/build/native/include/google/protobuf/empty.proto\
+ Protos/exercise_management.proto

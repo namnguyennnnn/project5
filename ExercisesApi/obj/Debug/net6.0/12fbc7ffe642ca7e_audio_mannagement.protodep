@@ -1,0 +1,2 @@
+obj\Debug\net6.0\Protos/AudioMannagement.cs \
+obj\Debug\net6.0\Protos/AudioMannagementGrpc.cs: Protos/audio_mannagement.proto

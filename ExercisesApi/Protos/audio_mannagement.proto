@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package python_pakage;
+
+message TrimaudioRequest {
+  string audio_url = 1;
+  string time = 2;
+}
+
+message TrimaudioResponse {
+  bytes audio_data = 1;
+}
+
+message MergeAudio2Request {
+  string audio_url = 1;
+  string time1 = 2;
+  string time2 = 3;
+}
+
+message MergeAudio2Response {
+  bytes audio_data = 1;
+}
+
+message MergeAudio3Request {
+  string audio_url = 1;
+  string time1 = 2;
+  string time2 = 3;
+  string time3 = 4;
+}
+
+message MergeAudio3Response {
+  bytes audio_data = 1;
+}
+service PythonAudioService {
+  rpc Trimaudio(TrimaudioRequest) returns (TrimaudioResponse);
+  rpc Merge2Audio(MergeAudio2Request) returns (MergeAudio2Response);
+  rpc Merge3Audio(MergeAudio3Request) returns (MergeAudio3Response);
+}
