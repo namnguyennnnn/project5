@@ -1,4 +1,6 @@
-﻿using ExercisesApi.Data;
+﻿using AutoMapper;
+using ExercisesApi.Data;
+using ExercisesApi.DTO.UpdateExerciseRequest;
 using ExercisesApi.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,12 +9,13 @@ namespace ExercisesApi.Repository.AudioRepo
     public class AudioRepository: IAudioRepository
     {
         private readonly DataContext _context;
-
-        public AudioRepository(DataContext context) 
-        { 
-            _context = context;
+        private readonly IMapper _mapper;
+        public AudioRepository(DataContext dataContext, IMapper mapper)
+        {
+            _context = dataContext;
+            _mapper = mapper;
         }
-        
+
 
         public async Task AddAudioAsync(Audio audio)
         {
@@ -25,17 +28,20 @@ namespace ExercisesApi.Repository.AudioRepo
             return await _context.audio.FirstOrDefaultAsync(a => a.exercise_id == exerciseId);
         }
 
-        public async Task UpdateAudioByExerciseIdAsync(string exerciseId, Audio updatedAudio)
+        public async Task UpdateAudioAsync(UpdateAudioDto updateAudioDto)
         {
-            var audio = await _context.audio.FirstOrDefaultAsync(a => a.exercise_id == exerciseId);
-            if (audio != null)
-            {
-                // Cập nhật thông tin audio
-                audio.audio_url = updatedAudio.audio_url;
-                // Cập nhật các trường khác nếu cần
+            var existingAudio = await _context.audio.FirstOrDefaultAsync(a => a.audio_id == updateAudioDto.audio_id);
 
-                await _context.SaveChangesAsync();
+            if (existingAudio != null)
+            {
+                existingAudio.audio_url = updateAudioDto.audio_url;
+                existingAudio.part1 = updateAudioDto.audio_url;
+                existingAudio.part2 = updateAudioDto.audio_url;
+                existingAudio.part3 = updateAudioDto.audio_url;
+                existingAudio.part4 = updateAudioDto.audio_url;
+                _context.audio.Update(existingAudio);
             }
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAudioByExerciseIdAsync(string exerciseId)

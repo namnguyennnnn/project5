@@ -1,5 +1,4 @@
-﻿
-using ExercisesApi.DTO;
+﻿using ExercisesApi.DTO.CreateExerciseDto;
 using ExercisesApi.Model;
 using ExercisesApi.Repository.AudioRepo;
 using ExercisesApi.Services.FileService;

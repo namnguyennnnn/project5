@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 
-namespace ExercisesApi.DTO
+namespace ExercisesApi.DTO.CreateExerciseDto
 {
     public class CreateQuestionDto
     {
@@ -8,6 +9,7 @@ namespace ExercisesApi.DTO
         public string question_content { get; set; }
         [Required]
         public int index { get; set; }
-        public string? paragraph { get; set; }
+
+        public CreateAnswerDto answer { get; set; }
     }
 }

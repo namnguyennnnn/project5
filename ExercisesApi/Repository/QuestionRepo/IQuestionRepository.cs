@@ -1,4 +1,5 @@
 ﻿using ExercisesApi.DTO;
+using ExercisesApi.DTO.UpdateExerciseRequest;
 using ExercisesApi.Model;
 
 namespace ExercisesApi.Repository.QuestionRepo
@@ -9,7 +10,7 @@ namespace ExercisesApi.Repository.QuestionRepo
         Task<Question> GetQuestionByIdAsync(string questionId);
         Task AddQuestionsAsync(List<Question> questions);
         Task AddQuestionAsync(Question question);
-        Task UpdateQuestionAsync(Question question);
+        Task UpdateQuestionAsync(List<UpdateQuestionDto> updateQuestionDtos);
         Task DeleteQuestionAsync(string questionId);
         Task DeleteQuestionByIdExerciseAsync(string exerciseId);
        

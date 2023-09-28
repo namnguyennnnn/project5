@@ -1,4 +1,5 @@
 ﻿
+using ExercisesApi.DTO.UpdateExerciseRequest;
 using ExercisesApi.Model;
 
 namespace ExercisesApi.Repository.AudioRepo
@@ -7,7 +8,7 @@ namespace ExercisesApi.Repository.AudioRepo
     {
         Task AddAudioAsync(Audio audio);
         Task<Audio> GetAudioByExerciseIdAsync(string exerciseId);
-        Task UpdateAudioByExerciseIdAsync(string exerciseId, Audio updatedAudio);
+        Task UpdateAudioAsync(UpdateAudioDto updateAudioDto);
         Task DeleteAudioByExerciseIdAsync(string exerciseId);
       
     }

@@ -18,6 +18,7 @@ namespace ExercisesApi.Data
         public DbSet<Question> questions { get; set; }
         public DbSet<Audio> audio { get; set; }       
         public DbSet<Image> images { get; set; }
+        public DbSet<Paragraph> paragraphs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +43,11 @@ namespace ExercisesApi.Data
              .HasOne(q => q.question)
              .WithOne(i => i.image)
              .HasForeignKey<Image>(a => a.question_id);
+
+            modelBuilder.Entity<Paragraph>()
+             .HasOne(q => q.question)
+             .WithOne(i => i.paragraph)
+             .HasForeignKey<Paragraph>(a => a.question_id);
         }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ExercisesApi.Migrations
 {
-    public partial class updateDbv1 : Migration
+    public partial class inserDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -59,7 +59,6 @@ namespace ExercisesApi.Migrations
                     question_id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
                     question_content = table.Column<string>(type: "longtext", nullable: false),
                     index = table.Column<int>(type: "int", nullable: false),
-                    paragraph = table.Column<string>(type: "longtext", nullable: true),
                     exercise_id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
                 },
                 constraints: table =>
@@ -119,6 +118,26 @@ namespace ExercisesApi.Migrations
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "paragraphs",
+                columns: table => new
+                {
+                    paragraph_id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false),
+                    paragraph = table.Column<string>(type: "longtext", nullable: false),
+                    question_id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_paragraphs", x => x.paragraph_id);
+                    table.ForeignKey(
+                        name: "FK_paragraphs_questions_question_id",
+                        column: x => x.question_id,
+                        principalTable: "questions",
+                        principalColumn: "question_id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
             migrationBuilder.CreateIndex(
                 name: "IX_answers_question_id",
                 table: "answers",
@@ -138,6 +157,12 @@ namespace ExercisesApi.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_paragraphs_question_id",
+                table: "paragraphs",
+                column: "question_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_questions_exercise_id",
                 table: "questions",
                 column: "exercise_id");
@@ -153,6 +178,9 @@ namespace ExercisesApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "images");
+
+            migrationBuilder.DropTable(
+                name: "paragraphs");
 
             migrationBuilder.DropTable(
                 name: "questions");

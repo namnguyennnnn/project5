@@ -24,7 +24,7 @@ namespace CategoryService.Controller
             return Ok(rs);
         }
 
-        [HttpPost("create-categoryDetal")]
+        [HttpPost("create-categoryDetail")]
         public async Task<IActionResult> CreateCategoryDetail([FromForm ]CategoryDetailDto categoryDetailDto)
         {
             var results = await _categoryDetailService.CreateCategoryDetail(categoryDetailDto);
@@ -38,7 +38,7 @@ namespace CategoryService.Controller
             return Ok(results);
         }    
 
-        [HttpDelete("{categoryDetalId}")]
+        [HttpDelete("{categoryDetailId}")]
         public async Task<ActionResult> DeleteCategoryDetail([FromRoute] string categoryDetalId)
         {
             var rs = await _categoryDetailService.DeleteCategoryDetail(categoryDetalId);

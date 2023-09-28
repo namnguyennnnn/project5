@@ -1,4 +1,4 @@
-﻿using ExercisesApi.DTO;
+﻿using ExercisesApi.DTO.CreateExerciseDto;
 
 namespace ExercisesApi.Services.AudioService
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ExercisesApi.DTO
+namespace ExercisesApi.DTO.CreateExerciseDto
 {
     public class CreateAnswerDto
     {

@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ExercisesApi.DTO
+namespace ExercisesApi.DTO.CreateExerciseDto
 {
     public class CreateAudioDto
     {
-        [Required]            
-        public IFormFile audio_url { get; set;}
+        [Required]
+        public IFormFile audio_url { get; set; }
         [Required]
         public string part1 { get; set; }
         [Required]

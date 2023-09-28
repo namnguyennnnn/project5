@@ -4,5 +4,6 @@
     {
         Task<string> SaveFile(IFormFile File);
         Task<bool> DeleteFiles(List<string> filePath);
+        Task<List<string>> SaveMultipleFiles(List<IFormFile> files);
     }
 }

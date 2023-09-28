@@ -3,6 +3,7 @@ using ExercisesApi.Repository.AnswerRepo;
 using ExercisesApi.Repository.AudioRepo;
 using ExercisesApi.Repository.ExerciseRepo;
 using ExercisesApi.Repository.ImageRepo;
+using ExercisesApi.Repository.ParagraphRepo;
 using ExercisesApi.Repository.QuestionRepo;
 using ExercisesApi.Services;
 using ExercisesApi.Services.AudioService;
@@ -26,13 +27,15 @@ builder.Services.AddCors(options =>
                 .AllowCredentials();
         });
 });
-builder.Services.AddControllers();
+
 
 var dbHost = "localhost";
 var dbName = "db-exercise";
 var dbPassword = "123456";
 var ConectionString = $"server={dbHost};port=3306;database={dbName};user=root;password={dbPassword};";
 builder.Services.AddDbContext<DataContext>(o => o.UseMySQL(ConectionString));
+
+
 
 //Deopendency injection 
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
@@ -48,9 +51,14 @@ builder.Services.AddScoped<IAudioService, AudioService>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IImageService, ImageService>();
 
-builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IParagraphRepository, ParagraphRepository>();
 
+
+builder.Services.AddScoped<IFileService, FileService>();
+//auto mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddControllers();
 builder.Services.AddGrpc();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

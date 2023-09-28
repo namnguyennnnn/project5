@@ -84,7 +84,21 @@ namespace ExercisesApi.Services.FileService
             }
         }
 
+        public async Task<List<string>> SaveMultipleFiles(List<IFormFile> files)
+        {
+            var fileUrls = new List<string>();
 
+            foreach (var file in files)
+            {
+                var result = await SaveFile(file);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    fileUrls.Add(result);
+                }
+            }
+
+            return fileUrls;
+        }
 
         private string GetPublicIdFromUrl(string url)
         {

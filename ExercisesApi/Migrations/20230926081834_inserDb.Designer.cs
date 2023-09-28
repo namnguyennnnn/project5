@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExercisesApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230924085441_updateDbv1")]
-    partial class updateDbv1
+    [Migration("20230926081834_inserDb")]
+    partial class inserDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -152,6 +152,29 @@ namespace ExercisesApi.Migrations
                     b.ToTable("images");
                 });
 
+            modelBuilder.Entity("ExercisesApi.Model.Paragraph", b =>
+                {
+                    b.Property<string>("paragraph_id")
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.Property<string>("paragraph")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("question_id")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.HasKey("paragraph_id");
+
+                    b.HasIndex("question_id")
+                        .IsUnique();
+
+                    b.ToTable("paragraphs");
+                });
+
             modelBuilder.Entity("ExercisesApi.Model.Question", b =>
                 {
                     b.Property<string>("question_id")
@@ -165,9 +188,6 @@ namespace ExercisesApi.Migrations
 
                     b.Property<int>("index")
                         .HasColumnType("int");
-
-                    b.Property<string>("paragraph")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("question_content")
                         .IsRequired()
@@ -213,6 +233,17 @@ namespace ExercisesApi.Migrations
                     b.Navigation("question");
                 });
 
+            modelBuilder.Entity("ExercisesApi.Model.Paragraph", b =>
+                {
+                    b.HasOne("ExercisesApi.Model.Question", "question")
+                        .WithOne("paragraph")
+                        .HasForeignKey("ExercisesApi.Model.Paragraph", "question_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("question");
+                });
+
             modelBuilder.Entity("ExercisesApi.Model.Question", b =>
                 {
                     b.HasOne("ExercisesApi.Model.Exercise", "exercise")
@@ -238,6 +269,9 @@ namespace ExercisesApi.Migrations
                         .IsRequired();
 
                     b.Navigation("image")
+                        .IsRequired();
+
+                    b.Navigation("paragraph")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

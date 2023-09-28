@@ -1,4 +1,8 @@
-﻿using ExercisesApi.Data;
+﻿using AutoMapper;
+using ExercisesApi.Data;
+using ExercisesApi.DTO.CreateExerciseDto;
+using ExercisesApi.DTO.GetInfoExerciseToUpdateDto;
+using ExercisesApi.DTO.UpdateExerciseRequest;
 using ExercisesApi.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,12 +11,12 @@ namespace ExercisesApi.Repository.AnswerRepo
     public class AnswerRepository : IAnswerRepository
     {
         private readonly DataContext _context;
-
-        public AnswerRepository(DataContext context)
+        private readonly IMapper _mapper;
+        public AnswerRepository(DataContext dataContext, IMapper mapper)
         {
-            _context = context;
+            _context = dataContext;
+            _mapper = mapper;
         }
-
         public async Task<Answer> GetAnswersByQuestionIdAsync(string questionId)
         {
             return await _context.answers.FindAsync(questionId);
@@ -35,9 +39,25 @@ namespace ExercisesApi.Repository.AnswerRepo
             _context.answers.Add(answer);
             await _context.SaveChangesAsync();
         }
-        public async Task UpdateAnswerAsync(Answer answer)
+        public async Task UpdateAnswerAsync(List<GetAnswerToUpdateDto> updateAnswerDtos)
         {
-            _context.Entry(answer).State = EntityState.Modified;
+            foreach (var updateAnswer in updateAnswerDtos)
+            {
+                var existingAnswer = await _context.answers.FirstOrDefaultAsync(a => a.answer_id == updateAnswer.answer_id);
+
+                if (existingAnswer != null)
+                {
+                    existingAnswer.answer_explanation = updateAnswer.answer_explanation;
+                    existingAnswer.a = updateAnswer.a;
+                    existingAnswer.b = updateAnswer.a;
+                    existingAnswer.c = updateAnswer.a;
+                    existingAnswer.d = updateAnswer.a;
+                    existingAnswer.corect_answer = updateAnswer.corect_answer;
+
+                    _context.answers.Update(existingAnswer);
+                    
+                }
+            }
             await _context.SaveChangesAsync();
         }
 

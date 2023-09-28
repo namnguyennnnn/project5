@@ -11,9 +11,14 @@ using ExercisesApi.Repository.ImageRepo;
 using Grpc.Net.Client;
 using PythonPakage;
 using CatagoryDetailsManagement;
-using ExercisesApi.Data;
 using ExercisesApi.DTO.examResponse;
 using System.Diagnostics;
+using ExercisesApi.Services.FileService;
+using ExercisesApi.Repository.ParagraphRepo;
+using ExercisesApi.DTO.CreateExerciseDto;
+using ExercisesApi.DTO.GetInfoExerciseToUpdateDto;
+using ExercisesApi.DTO.UpdateExerciseRequest;
+
 
 namespace ExercisesApi.Services.ExerciseService
 {
@@ -28,6 +33,8 @@ namespace ExercisesApi.Services.ExerciseService
         private readonly IImageRepository _imageRepository;
         private readonly GrpcChannel _channelAudio;
         private readonly GrpcChannel _channelCategory;
+        private readonly IFileService _fileService;
+        private readonly IParagraphRepository _paragraphRepository;
 
         public ExerciseServices(IImageRepository imageRepository,
             IAudioRepository audioRepository,
@@ -35,7 +42,9 @@ namespace ExercisesApi.Services.ExerciseService
             IExerciseRepository exerciseRepository,
             IAnswerRepository answerRepository,
             IQuestionRepository questionRepository,
-            IImageService imageService
+            IImageService imageService,
+             IFileService fileService,
+             IParagraphRepository paragraphRepository
             )
         {
             _exerciseRepository = exerciseRepository;
@@ -45,9 +54,10 @@ namespace ExercisesApi.Services.ExerciseService
             _audioService = audioService;
             _audioRepository = audioRepository;
             _imageRepository = imageRepository;
-            
+            _fileService = fileService;
             _channelAudio = GrpcChannelManager.AudioChannel;
             _channelCategory = GrpcChannelManager.CategoryChannel;
+            _paragraphRepository = paragraphRepository;
         }
 
         public async Task<StatusResponse> CreateExercise(CreateExerciseRequestDto exerciseRequestDto)
@@ -56,11 +66,12 @@ namespace ExercisesApi.Services.ExerciseService
             {
                 throw new ArgumentNullException(nameof(exerciseRequestDto));
             }
+
             var stopwatch = new Stopwatch();
-            stopwatch.Start(); // Start measuring time
-            try 
+            stopwatch.Start(); // Start measuring time        
+
+            try
             {
-                
                 var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
                 var newExercise = new Exercise
                 {
@@ -73,36 +84,78 @@ namespace ExercisesApi.Services.ExerciseService
 
                 await _exerciseRepository.AddExerciseAsync(newExercise);
 
-                if (exerciseRequestDto.questionDtos != null && exerciseRequestDto.answerDtos != null
-                    && exerciseRequestDto.questionDtos.Count == exerciseRequestDto.answerDtos.Count)
+                var questionBatch = new List<Question>();
+                var answerBatch = new List<Answer>();
+                var imageBatch = new List<Image>();
+                var paragraphBatch = new List<Paragraph>();
+
+                if (exerciseRequestDto.questionDtos != null )
                 {
-                    // Parallel processing for inserting questions and answers
-                    var insertTasks = new List<Task>();
+                                 
+
                     for (int i = 0; i < exerciseRequestDto.questionDtos.Count; i++)
                     {
                         var questionDto = exerciseRequestDto.questionDtos[i];
-                        var answerDto = exerciseRequestDto.answerDtos[i];
+                       
+                        var questionId = Guid.NewGuid().ToString();
 
-                        var questionId = await InsertQuestionAsync(newExercise, questionDto);
-                        await InsertAnswerAsync(questionId, answerDto);
-
-                        if (exerciseRequestDto.image_url != null && exerciseRequestDto.image_url.Count > i)
+                        var newQuestion = new Question
                         {
-                            var imageUrl = exerciseRequestDto.image_url[i];
-                            await InsertImageAsync(imageUrl, questionId);
+                            question_id = questionId,
+                            question_content = questionDto.question_content,
+                            index = questionDto.index,
+                            exercise_id = newExercise.exercise_id,
+                        };
+
+                        questionBatch.Add(newQuestion);
+
+                        var newAnswer = new Answer
+                        {
+                            answer_id = Guid.NewGuid().ToString(),
+                            answer_explanation = questionDto.answer.answer_explanation,
+                            a = questionDto.answer.a,
+                            b = questionDto.answer.b,
+                            c = questionDto.answer.c,
+                            d = questionDto.answer.d,
+                            corect_answer = questionDto.answer.corect_answer,
+                            question_id = questionId
+                        };
+
+                        answerBatch.Add(newAnswer);
+                        var imageDto = exerciseRequestDto.imageDto.FirstOrDefault(img => img.questionIndex == questionDto.index);
+                        var paragraphDto = exerciseRequestDto.paragraphDto.FirstOrDefault(paragraph => paragraph.questionIndex == questionDto.index);
+
+                        if (imageDto != null)
+                        {
+                            var newImage = await _imageService.CreateImage(imageDto.imageFile, newQuestion.question_id);
+                            imageBatch.Add(newImage);
+                        }
+
+                        if (paragraphDto != null)
+                        {
+                            var newParagraph = await CreateParagraph(paragraphDto.paragrahpFile, newQuestion.question_id);
+                            paragraphBatch.Add(newParagraph);
                         }
                     }
-
-                    await Task.WhenAll(insertTasks);
                 }
 
+                await _questionRepository.AddQuestionsAsync(questionBatch);
+                await _answerRepository.AddAnswersAsync(answerBatch);
+                if (imageBatch.Count > 0)
+                {
+                    await _imageRepository.AddImagesAsync(imageBatch);
+                }
+                if (paragraphBatch.Count > 0)
+                {
+                    await _paragraphRepository.AddParagraphsAsync(paragraphBatch);
+                }
                 if (exerciseRequestDto.audioDto != null)
                 {
                     await _audioService.CreateAudio(exerciseRequestDto.audioDto, newExercise.exercise_id);
                 }
                 else
                 {
-                    throw new Exception("null rồi");
+                    throw new Exception("Audio data is null.");
                 }
 
                 return new StatusResponse
@@ -120,51 +173,22 @@ namespace ExercisesApi.Services.ExerciseService
                 Console.WriteLine($"CreateExercise took {elapsed.TotalSeconds} seconds");
             }
         }
-        //---------for get exam functon----------
-        private async Task<string> InsertQuestionAsync(Exercise newExercise, CreateQuestionDto questionDto)
+
+        private async Task<Paragraph> CreateParagraph(IFormFile url, string questionId)
         {
-            var newQuestion = new Question
+            var filePath = await _fileService.SaveFile(url);
+            return new Paragraph
             {
-                question_id = Guid.NewGuid().ToString(),
-                question_content = questionDto.question_content,
-                index = questionDto.index,
-                paragraph = questionDto.paragraph,
-                exercise_id = newExercise.exercise_id,
-            };
-
-            await _questionRepository.AddQuestionAsync(newQuestion);
-
-            // Return the newly generated question ID
-            return newQuestion.question_id;
-        }
-
-
-        private async Task InsertAnswerAsync(string questionId, CreateAnswerDto answerDto)
-        {
-            var newAnswer = new Answer
-            {
-                answer_id = Guid.NewGuid().ToString(),
-                answer_explanation = answerDto.answer_explanation,
-                a = answerDto.a,
-                b = answerDto.b,
-                c = answerDto.c,
-                d = answerDto.d,
-                corect_answer = answerDto.corect_answer,
+                paragraph_id = Guid.NewGuid().ToString(),
+                paragraph_url = filePath,
                 question_id = questionId
             };
-
-            await _answerRepository.AddAnswerAsync(newAnswer);
         }
-
-        private async Task InsertImageAsync(IFormFile imageUrl, string questionId)
-        {
-            await _imageService.CreateImage(imageUrl, questionId);
-        }
-
-
+       
+        
         public async Task<ExamResponse> GetExamAsync(string exerciseId, List<int>? parts = null)
         {
-
+            var partsSort = parts.OrderBy(x => x).ToList();
             var result = new ExamResponse();
             var questionresponse = new Dictionary<string, List<QuestionDto>>();
             var audioInfo = new InfoAudioToTrim();
@@ -173,14 +197,14 @@ namespace ExercisesApi.Services.ExerciseService
             var infoCategoryDetail = await GetCategoryInfo(exercise.category_detail_id);
             if (exercise != null)
             {
-                if (parts == null || parts.Count == 0)
+                if (partsSort == null || partsSort.Count == 0)
                 {
-                    parts = new List<int> { 1, 2, 3, 4, 5, 6, 7 };
+                    partsSort = new List<int> { 1, 2, 3, 4, 5, 6, 7 };
                 }
 
                 var timeRange = new List<string>();
 
-                foreach (var part in parts)
+                foreach (var part in partsSort)
                 {
                     var partQuestions = exercise.questions
                         .Where(q => (q.index >= GetStartIndexForPart(part) && q.index <= GetEndIndexForPart(part)))
@@ -189,7 +213,7 @@ namespace ExercisesApi.Services.ExerciseService
                             question_id = q.question_id,
                             question_content = q.question_content,
                             index = q.index,
-                            paragraph = q.paragraph,
+                            paragraph_url = q.paragraph != null ? q.paragraph.paragraph_url: null,
                             corect_answer = q.answer.corect_answer,
                             image_url = q.image != null ? q.image.image_url : null,
                             answer_explanation = q.answer.answer_explanation,
@@ -252,38 +276,139 @@ namespace ExercisesApi.Services.ExerciseService
             
             return result;
         }
-        //-----------------------------------------
-
+     
         public async Task<byte[]> GetAudioAsync(string url, List<string> timeRange)
         {
             var rs = await GetDataAudio(url, timeRange);
             return rs;                     
         }
-
-        public async Task<StatusResponse> UpdateExercise(string exerciseId, ExerciseUpdateRequest exerciseModel)
+        
+        public async Task<GetExerciseToUpdateDto> GetExerciseByIdForUpdateAsync(string exerciseId ) 
         {
-            if (exerciseModel == null)
+            if (exerciseId == null)
             {
-                throw new ArgumentNullException(nameof(exerciseModel));
-            }
-            var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-            var exercise = await _exerciseRepository.GetExerciseByIdAsync(exerciseId);
-            if (exercise == null)
-            {
-                throw new ArgumentNullException(nameof(exercise));
+                throw new ArgumentNullException(nameof(exerciseId));
             }
 
-            exercise.title_of_exercise = exerciseModel.title_of_exercise;
-            exercise.exercise_description = exerciseModel.exercise_description;
-            exercise.category_detail_id = exerciseModel.category_detail_id;
-            exercise.create_at = localTime;
+            var exercise = await _exerciseRepository.GetExerciseByIdForUpdateAsync(exerciseId);
 
-            await _exerciseRepository.UpdateExerciseAsync(exercise);
-            return new StatusResponse
+            return exercise;
+        }
+
+        public async Task<GetExerciseToUpdateDto> UpdateExamAsync(string exerciseId, UpdateExerciseRequestDto requestDto)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start(); // Start measuring time        
+            try 
             {
-                StatusCode = 200,
-                StatusDetail = "Success"
-            };
+                var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                var exercise = await _exerciseRepository.GetExamByIdExerciseAsync(exerciseId);
+                
+                if (exercise == null)
+                {
+                    throw new ArgumentNullException(nameof(exercise));
+                }
+                
+                List<UpdateImageDto> imageBatch = new List<UpdateImageDto>();
+                List<UpdateParagraphDto> paragraphBatch = new List<UpdateParagraphDto>();
+                if (requestDto.exerciseToUpdateDto != null)
+                {
+                    var exInfo = new ExerciseInfo
+                    {
+                        exercise_id = exerciseId,
+                        title_of_exercise = requestDto.exerciseToUpdateDto.title_of_exercise,
+                        exercise_description = requestDto.exerciseToUpdateDto.exercise_description,
+                        category_detail_id = requestDto.exerciseToUpdateDto.category_detail_id,
+                        create_at = localTime.ToString(),
+                    };
+
+                    await _exerciseRepository.UpdateExerciseAsync(exInfo);
+                }
+                if (requestDto.questionToUpdateDto != null)
+                {                 
+                    await _questionRepository.UpdateQuestionAsync(requestDto.questionToUpdateDto);
+                }
+
+                if (requestDto.answerToUpdateDto != null)
+                {
+                    await _answerRepository.UpdateAnswerAsync(requestDto.answerToUpdateDto);
+                }
+
+                if (requestDto.imageToUpdateDto != null)
+                {
+                    foreach (var image in requestDto.imageToUpdateDto)
+                    {
+                        if (image.imageFile != null)
+                        {
+                            var fileUrl = await _fileService.SaveFile(image.imageFile);
+                            var imagefile = new UpdateImageDto
+                            {
+                                image_id = image.image_id,
+                                image_url = fileUrl,
+                                question_id = image.question_id
+                            };
+                            imageBatch.Add(imagefile);
+                        }
+                        else
+                        {
+                            imageBatch.Add(image);
+                        }                         
+                    }
+                    await _imageRepository.UpdateImagesAsync(imageBatch);
+                }
+
+                if (requestDto.paragraphToUpdateDto != null)
+                {
+                    foreach (var paragraph in requestDto.paragraphToUpdateDto)
+                    {
+                        if (paragraph.paragraphFile != null)
+                        {
+                            var fileUrl = await _fileService.SaveFile(paragraph.paragraphFile);
+                            var paragraphFile = new UpdateParagraphDto
+                            {
+                                paragraph_id = paragraph.paragraph_id,
+                                paragraph_url = fileUrl,
+                                question_id = paragraph.question_id
+                            };
+                            paragraphBatch.Add(paragraphFile);
+                        }                       
+                        paragraphBatch.Add(paragraph);
+                    }
+                    await _paragraphRepository.UpdateParagraphsAsync(paragraphBatch);
+                }
+
+                if (requestDto.audioToUpdateDto != null)
+                {
+                    var audio = requestDto.audioToUpdateDto;
+                    if (audio.audioFile != null)
+                    {
+                        var audioUrl = await _fileService.SaveFile(audio.audioFile);
+                        var audioInForFile = new UpdateAudioDto
+                        {
+                            audio_id = audio.audio_id,
+                            audio_url = audioUrl,
+                            exercise_id = requestDto.audioToUpdateDto.exercise_id,
+                            part1 = requestDto.audioToUpdateDto.part1,
+                            part2 = requestDto.audioToUpdateDto.part2,
+                            part3 = requestDto.audioToUpdateDto.part3,
+                            part4 = requestDto.audioToUpdateDto.part4,
+                        };
+                        await _audioRepository.UpdateAudioAsync(audioInForFile);
+                    }                  
+                    await _audioRepository.UpdateAudioAsync(requestDto.audioToUpdateDto);
+                }
+
+                return await _exerciseRepository.GetExerciseByIdForUpdateAsync(exerciseId);
+            } 
+            finally 
+            {
+
+                stopwatch.Stop();
+                TimeSpan elapsed = stopwatch.Elapsed;     
+                Console.WriteLine($"CreateExercise took {elapsed.TotalSeconds} seconds");
+            } 
+            
+
         }
 
         public async Task<StatusResponse> DeleteExercise(string exerciseId)
@@ -300,7 +425,11 @@ namespace ExercisesApi.Services.ExerciseService
             };
         }
 
-        public  async Task<List<ExerciseInfo>> GetListExercise(string categoryDetailId)
+        public async Task<List<ExerciseInfo>> GetExercises()
+        {
+            return await _exerciseRepository.GetExercisesAsync();
+        }
+        public  async Task<List<ExerciseInfo>> GetExercisesByCategoryDetail(string categoryDetailId)
         {
             var exercises = await _exerciseRepository.GetExercisesByCategoryDetailIdAsync(categoryDetailId);
             return exercises;

@@ -1,4 +1,5 @@
-﻿using ExercisesApi.Model;
+﻿using ExercisesApi.DTO.UpdateExerciseRequest;
+using ExercisesApi.Model;
 
 namespace ExercisesApi.Repository.ImageRepo
 {
@@ -6,8 +7,8 @@ namespace ExercisesApi.Repository.ImageRepo
     {
         Task AddImageAsync(Image image);
         Task<Image> GetImageByQuestionIdAsync(string questionId);
-        Task UpdateImageAsync(string questionId, Image updatedImageInfo);
+        Task UpdateImagesAsync(List<UpdateImageDto> updateImageDtos);
         Task DeleteImageAsync(string questionId);
-
+        Task AddImagesAsync(List<Image> images);
     }
 }
