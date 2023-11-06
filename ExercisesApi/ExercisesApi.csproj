@@ -4,26 +4,33 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>SOSEX-8688d7ac-69d7-4003-a26c-45a5c1fe0ed9</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Protos\audio_mannagement.proto" />
     <None Remove="Protos\catagory_details_management.proto" />
     <None Remove="Protos\exercise_management.proto" />
+    <None Remove="Protos\user_management.proto" />
   </ItemGroup>
 
   <ItemGroup>
 	  <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-	  <PackageReference Include="CloudinaryDotNet" Version="1.22.0" />
+	  <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
+	  <PackageReference Include="EPPlus" Version="6.2.10" />
+	  <PackageReference Include="Google.Cloud.Storage.V1" Version="4.6.0" />
 	  <PackageReference Include="Google.Protobuf" Version="3.24.3" />	  
 	  <PackageReference Include="Grpc.Net.Client" Version="2.57.0" />
 	  <PackageReference Include="Grpc.Tools" Version="2.58.0" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.21" />
+	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
 	  <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.13" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.21" />
-	  <PackageReference Include="NAudio" Version="2.2.1" />
       <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
+      
+      
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
@@ -31,6 +38,8 @@
     <Protobuf Include="Protos\audio_mannagement.proto" GrpcServices="Client" />
     <Protobuf Include="Protos\catagory_details_management.proto" GrpcServices="Client" />
     <Protobuf Include="Protos\exercise_management.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\user_management.proto" GrpcServices="Client" />
   </ItemGroup>
 
+ 
 </Project>

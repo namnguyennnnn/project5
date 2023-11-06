@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ExercisesApi.Data;
-using ExercisesApi.DTO.UpdateExerciseRequest;
+using ExercisesApi.DTO.CreateExerciseDto;
 using ExercisesApi.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,17 +28,17 @@ namespace ExercisesApi.Repository.AudioRepo
             return await _context.audio.FirstOrDefaultAsync(a => a.exercise_id == exerciseId);
         }
 
-        public async Task UpdateAudioAsync(UpdateAudioDto updateAudioDto)
+        public async Task UpdateAudioAsync(CreateAudioDto updateAudioDto)
         {
             var existingAudio = await _context.audio.FirstOrDefaultAsync(a => a.audio_id == updateAudioDto.audio_id);
 
             if (existingAudio != null)
             {
-                existingAudio.audio_url = updateAudioDto.audio_url;
-                existingAudio.part1 = updateAudioDto.audio_url;
-                existingAudio.part2 = updateAudioDto.audio_url;
-                existingAudio.part3 = updateAudioDto.audio_url;
-                existingAudio.part4 = updateAudioDto.audio_url;
+                existingAudio.audio_url = updateAudioDto.audio_url?? existingAudio.audio_url;
+                existingAudio.part1 = updateAudioDto.part1 ?? existingAudio.part1;
+                existingAudio.part2 = updateAudioDto.part2?? existingAudio.part2;
+                existingAudio.part3 = updateAudioDto.part3 ?? existingAudio.part3;
+                existingAudio.part4 = updateAudioDto.part4 ?? existingAudio.part4;
                 _context.audio.Update(existingAudio);
             }
             await _context.SaveChangesAsync();

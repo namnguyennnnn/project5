@@ -7,5 +7,6 @@
         public string? title_of_exercise { get; set; }
         public string? exercise_description { get; set; }
         public string? create_at { get; set; } 
+       
     }
 }

@@ -1,0 +1,2 @@
+obj\Debug\net6.0\Protos/UserManagement.cs \
+obj\Debug\net6.0\Protos/UserManagementGrpc.cs: Protos/user_management.proto

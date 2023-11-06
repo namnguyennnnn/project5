@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ExercisesApi.Data;
-using ExercisesApi.DTO.UpdateExerciseRequest;
+using ExercisesApi.DTO.CreateExerciseDto;
 using ExercisesApi.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,11 +10,10 @@ namespace ExercisesApi.Repository.ImageRepo
     public class ImageRepository: IImageRepository
     {
         private readonly DataContext _context;
-        private readonly IMapper _mapper;
-        public ImageRepository(DataContext dataContext, IMapper mapper)
+        
+        public ImageRepository(DataContext dataContext)
         {
-            _context = dataContext;
-            _mapper = mapper;
+            _context = dataContext;         
         }
         public async Task AddImageAsync(Image image)
         {
@@ -28,7 +27,7 @@ namespace ExercisesApi.Repository.ImageRepo
         }
 
 
-        public async Task UpdateImagesAsync(List<UpdateImageDto> updateImageDtos)
+        public async Task UpdateImagesAsync(List<CreateImageDto> updateImageDtos)
         {
             foreach (var updateImage in updateImageDtos)
             {
@@ -36,8 +35,8 @@ namespace ExercisesApi.Repository.ImageRepo
 
                 if (existingImage != null)
                 {
-                    existingImage.image_url = updateImage.image_url;
-                    existingImage.question_id = updateImage.question_id;
+                    existingImage.image_url = updateImage.image_url?? existingImage.image_url;
+                    existingImage.question_id = updateImage.question_id ?? existingImage.question_id;
                     _context.images.Update(existingImage);
                 }
             }

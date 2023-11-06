@@ -49,6 +49,10 @@ namespace CatagoryDetailsManagement {
     static readonly grpc::Marshaller<global::CatagoryDetailsManagement.GetCatagoryDetailInForRequest> __Marshaller_catagory_details_management_GetCatagoryDetailInForRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::CatagoryDetailsManagement.GetCatagoryDetailInForRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::CatagoryDetailsManagement.GetCatagoryDetailInForResponse> __Marshaller_catagory_details_management_GetCatagoryDetailInForResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::CatagoryDetailsManagement.GetCatagoryDetailInForResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameRequest> __Marshaller_catagory_details_management_GetCatagoryDetailInForByNameRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameRequest.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameResponse> __Marshaller_catagory_details_management_GetCatagoryDetailInForByNameResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::CatagoryDetailsManagement.GetCatagoryDetailInForRequest, global::CatagoryDetailsManagement.GetCatagoryDetailInForResponse> __Method_GetCatagoryDetailInFor = new grpc::Method<global::CatagoryDetailsManagement.GetCatagoryDetailInForRequest, global::CatagoryDetailsManagement.GetCatagoryDetailInForResponse>(
@@ -57,6 +61,14 @@ namespace CatagoryDetailsManagement {
         "GetCatagoryDetailInFor",
         __Marshaller_catagory_details_management_GetCatagoryDetailInForRequest,
         __Marshaller_catagory_details_management_GetCatagoryDetailInForResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameRequest, global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameResponse> __Method_GetCatagoryDetailInForByName = new grpc::Method<global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameRequest, global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "GetCatagoryDetailInForByName",
+        __Marshaller_catagory_details_management_GetCatagoryDetailInForByNameRequest,
+        __Marshaller_catagory_details_management_GetCatagoryDetailInForByNameResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -110,6 +122,26 @@ namespace CatagoryDetailsManagement {
       public virtual grpc::AsyncUnaryCall<global::CatagoryDetailsManagement.GetCatagoryDetailInForResponse> GetCatagoryDetailInForAsync(global::CatagoryDetailsManagement.GetCatagoryDetailInForRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_GetCatagoryDetailInFor, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameResponse GetCatagoryDetailInForByName(global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return GetCatagoryDetailInForByName(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameResponse GetCatagoryDetailInForByName(global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_GetCatagoryDetailInForByName, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameResponse> GetCatagoryDetailInForByNameAsync(global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return GetCatagoryDetailInForByNameAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameResponse> GetCatagoryDetailInForByNameAsync(global::CatagoryDetailsManagement.GetCatagoryDetailInForByNameRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_GetCatagoryDetailInForByName, null, options, request);
       }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]

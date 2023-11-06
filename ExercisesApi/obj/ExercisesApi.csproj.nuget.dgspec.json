@@ -44,9 +44,17 @@
               "target": "Package",
               "version": "[12.0.1, )"
             },
-            "CloudinaryDotNet": {
+            "DocumentFormat.OpenXml": {
               "target": "Package",
-              "version": "[1.22.0, )"
+              "version": "[2.20.0, )"
+            },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[6.2.10, )"
+            },
+            "Google.Cloud.Storage.V1": {
+              "target": "Package",
+              "version": "[4.6.0, )"
             },
             "Google.Protobuf": {
               "target": "Package",
@@ -76,13 +84,13 @@
               "target": "Package",
               "version": "[6.0.21, )"
             },
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.19.4, )"
+            },
             "MySql.EntityFrameworkCore": {
               "target": "Package",
               "version": "[6.0.13, )"
-            },
-            "NAudio": {
-              "target": "Package",
-              "version": "[2.2.1, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

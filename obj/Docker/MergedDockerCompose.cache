@@ -1,35 +1,46 @@
 name: dockercompose5720751359991469149
 services:
-  categoryservice:
+  category-api:
     build:
       context: D:\hoctap\LuanVan
-      dockerfile: CategoryService/Dockerfile
+      dockerfile: CategoryApi/Dockerfile
+    depends_on:
+      database-mysql:
+        condition: service_started
+        required: true
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: https://+:443;http://+:80
-    image: categoryservice
+      'DB_HOST ': ' database-mysql'
+      'DB_NAME ': ' toeic-db'
+      'DB_ROOT_PASSWORD ': "123456"
+    image: categoryapi:latest
     networks:
       default: null
     ports:
     - mode: ingress
-      target: 80
+      target: 443
+      published: "8002"
       protocol: tcp
     - mode: ingress
-      target: 443
+      target: 80
+      published: "5001"
       protocol: tcp
-    volumes:
-    - type: bind
-      source: C:\Users\namng\AppData\Roaming/Microsoft/UserSecrets
-      target: /root/.microsoft/usersecrets
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: C:\Users\namng\AppData\Roaming/ASP.NET/Https
-      target: /root/.aspnet/https
-      read_only: true
-      bind:
-        create_host_path: true
+    restart: unless-stopped
+  database-mysql:
+    container_name: toeic-db
+    environment:
+      'DB_NAME ': ' toeic-db'
+      'DB_ROOT_PASSWORD ': "123456"
+    expose:
+    - "3306"
+    image: mysql:8.0.35
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 3306
+      published: "3306"
+      protocol: tcp
+    restart: always
 networks:
   default:
     name: dockercompose5720751359991469149_default

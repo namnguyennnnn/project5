@@ -1,4 +1,4 @@
-﻿using ExercisesApi.DTO.UpdateExerciseRequest;
+﻿using ExercisesApi.DTO.CreateExerciseDto;
 using ExercisesApi.Model;
 
 namespace ExercisesApi.Repository.ParagraphRepo
@@ -9,6 +9,6 @@ namespace ExercisesApi.Repository.ParagraphRepo
         Task<Paragraph> GetParagraphByQuestionIdAsync(string questionId);
         Task DeleteParagraphAsync(string questionId);
         Task AddParagraphsAsync(List<Paragraph> Paragraphs);
-        Task UpdateParagraphsAsync(List<UpdateParagraphDto> updateParagraphDtos);
+        Task UpdateParagraphsAsync(List<CreateParagraphDto> updateParagraphDtos);
     }
 }

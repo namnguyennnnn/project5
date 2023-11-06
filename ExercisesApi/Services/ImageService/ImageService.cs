@@ -16,7 +16,7 @@ namespace ExercisesApi.Services.ImageService
 
         public async Task<Image> CreateImage(IFormFile url,string questionId)
         {
-            var filePath = await _fileService.SaveFile(url);
+            var filePath = await _fileService.UploadFileAsync(url);
             return  new Image
             {
                 image_id = Guid.NewGuid().ToString(),
@@ -24,23 +24,15 @@ namespace ExercisesApi.Services.ImageService
                 question_id = questionId
             };
         }
-        public async Task CreateImages(List<IFormFile> urls, List<string> questionIds)
+        public async Task<Image> CreateImageByData(byte[] imageData, string questionId)
         {
-            if (urls.Count != questionIds.Count)
-            {
-                throw new ArgumentException("The number of urls must match the number of questionIds.");
-            }
-
-            var fileUrls = await _fileService.SaveMultipleFiles(urls);
-
-            var newImages = fileUrls.Select((url, index) => new Image
+            var filePath = await _fileService.UploadImageByDataAsync(imageData);
+            return new Image
             {
                 image_id = Guid.NewGuid().ToString(),
-                image_url = url,
-                question_id = questionIds[index]
-            }).ToList();
-
-            await _imageRepository.AddImagesAsync(newImages);
+                image_url = filePath,
+                question_id = questionId
+            };
         }
     }
 }

@@ -2,8 +2,10 @@
 {
     public interface IFileService
     {
-        Task<string> SaveFile(IFormFile File);
-        Task<bool> DeleteFiles(List<string> filePath);
-        Task<List<string>> SaveMultipleFiles(List<IFormFile> files);
+        Task<string> UploadFileAsync(IFormFile file);
+        Task<string> UploadAudioByDataAsync(byte[] audioData);
+        Task<string> UploadImageByDataAsync(byte[] imageData);
+        Task<string> GetSignedUrl(string fileName);
+        Task DeleteFilesAsync(IEnumerable<string> fileUris);
     }
 }

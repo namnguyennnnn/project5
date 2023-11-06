@@ -10,9 +10,11 @@ namespace ExercisesApi.Model
         public string category_detail_id { get; set; }
         public string title_of_exercise { get; set; }
         public string exercise_description { get; set; }
-        public DateTime? create_at { get; set; } = default(DateTime?);
+        public string? create_at { get; set; } 
         
         public Audio audio { get; set; }
         public List<Question> questions { get; set; }
+        public List<ExamResult> examResults { get; set; }
+
     }
 }

@@ -4,7 +4,7 @@ namespace ExercisesApi.DTO.CreateExerciseDto
 {
     public class CreateAnswerDto
     {
-
+        public string? answer_id { get; set;}
         [Required]
         public string answer_explanation { get; set; }
         [Required]

@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using ExercisesApi.Data;
 using ExercisesApi.DTO.CreateExerciseDto;
-using ExercisesApi.DTO.GetInfoExerciseToUpdateDto;
-using ExercisesApi.DTO.UpdateExerciseRequest;
 using ExercisesApi.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +37,7 @@ namespace ExercisesApi.Repository.AnswerRepo
             _context.answers.Add(answer);
             await _context.SaveChangesAsync();
         }
-        public async Task UpdateAnswerAsync(List<GetAnswerToUpdateDto> updateAnswerDtos)
+        public async Task UpdateAnswerAsync(List<CreateAnswerDto> updateAnswerDtos)
         {
             foreach (var updateAnswer in updateAnswerDtos)
             {
@@ -47,12 +45,12 @@ namespace ExercisesApi.Repository.AnswerRepo
 
                 if (existingAnswer != null)
                 {
-                    existingAnswer.answer_explanation = updateAnswer.answer_explanation;
-                    existingAnswer.a = updateAnswer.a;
-                    existingAnswer.b = updateAnswer.a;
-                    existingAnswer.c = updateAnswer.a;
-                    existingAnswer.d = updateAnswer.a;
-                    existingAnswer.corect_answer = updateAnswer.corect_answer;
+                    existingAnswer.answer_explanation = updateAnswer.answer_explanation ?? existingAnswer.answer_explanation;
+                    existingAnswer.a = updateAnswer.a?? existingAnswer.a;
+                    existingAnswer.b = updateAnswer.b ?? existingAnswer.b;
+                    existingAnswer.c = updateAnswer.c ?? existingAnswer.c;
+                    existingAnswer.d = updateAnswer.d ??existingAnswer.d;
+                    existingAnswer.corect_answer = updateAnswer.corect_answer?? existingAnswer.corect_answer;
 
                     _context.answers.Update(existingAnswer);
                     

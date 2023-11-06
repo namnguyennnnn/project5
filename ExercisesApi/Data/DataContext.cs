@@ -1,7 +1,6 @@
 ﻿using ExercisesApi.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
+
 
 
 namespace ExercisesApi.Data
@@ -19,6 +18,8 @@ namespace ExercisesApi.Data
         public DbSet<Audio> audio { get; set; }       
         public DbSet<Image> images { get; set; }
         public DbSet<Paragraph> paragraphs { get; set; }
+        public DbSet<ExamResult> exam_results { get; set; }
+        public DbSet<ExamResultDetail> exam_result_details { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,9 +31,9 @@ namespace ExercisesApi.Data
                 .HasForeignKey<Answer>(a => a.question_id);
 
             modelBuilder.Entity<Question>()
-                .HasOne(a => a.exercise)
+                .HasOne(e => e.exercise)
                 .WithMany(q => q.questions)
-                .HasForeignKey(a => a.exercise_id);
+                .HasForeignKey(e => e.exercise_id);
 
             modelBuilder.Entity<Audio>()
                .HasOne(e => e.exercise)
@@ -40,14 +41,29 @@ namespace ExercisesApi.Data
                .HasForeignKey<Audio>(a => a.exercise_id);
 
             modelBuilder.Entity<Image>()
-             .HasOne(q => q.question)
-             .WithOne(i => i.image)
-             .HasForeignKey<Image>(a => a.question_id);
+                 .HasOne(q => q.question)
+                 .WithOne(i => i.image)
+                 .HasForeignKey<Image>(a => a.question_id);
 
             modelBuilder.Entity<Paragraph>()
-             .HasOne(q => q.question)
-             .WithOne(i => i.paragraph)
-             .HasForeignKey<Paragraph>(a => a.question_id);
+                 .HasOne(q => q.question)
+                 .WithOne(i => i.paragraph)
+                 .HasForeignKey<Paragraph>(a => a.question_id);
+
+            modelBuilder.Entity<ExamResult>()
+                .HasOne(e => e.exercise)
+                .WithMany(ex => ex.examResults)
+                .HasForeignKey(e => e.exercise_id);
+
+            modelBuilder.Entity<ExamResultDetail>()
+               .HasOne(er => er.examResult)
+               .WithMany(erd => erd.examResultDetails)
+               .HasForeignKey(er => er.exam_result_id);
+
+            modelBuilder.Entity<ExamResultDetail>()
+               .HasOne(q => q.question)
+               .WithMany(erd => erd.examResultDetail)
+               .HasForeignKey(q => q.question_id);
         }
     }
 }

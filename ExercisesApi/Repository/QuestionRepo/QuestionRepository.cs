@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ExercisesApi.Data;
-using ExercisesApi.DTO;
-using ExercisesApi.DTO.UpdateExerciseRequest;
+using ExercisesApi.DTO.CreateExerciseDto;
+using ExercisesApi.DTO.examResponse;
 using ExercisesApi.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,21 +10,40 @@ namespace ExercisesApi.Repository.QuestionRepo
     public class QuestionRepository:IQuestionRepository
     {
         private readonly DataContext _context;
-        private readonly IMapper _mapper;
-
-        public QuestionRepository(DataContext context, IMapper mapper)
+        public QuestionRepository(DataContext context)
         {
-            _context = context;
-            _mapper = mapper;
+            _context = context;     
         }
 
-        public async Task<List<Question>> GetQuestionsByExerciseIdAsync(string exerciseId)
+        public async Task<List<QuestionDto>> GetQuestionsByExerciseIdAsync(string exerciseId)
         {
-            return await _context.questions
+            var questions = await _context.questions
                 .Where(q => q.exercise_id == exerciseId)
+                .Include(q => q.answer)
                 .OrderBy(q => q.index) 
                 .ToListAsync();
+
+            var questionDtos = questions.Select(q => new QuestionDto
+            {
+                question_id = q.question_id,
+                question_content = q.question_content,
+                index = q.index,
+                corect_answer = q.answer.corect_answer,
+                paragraph_url = q.paragraph?.paragraph_url,
+                answer_explanation = q.answer.answer_explanation,
+                answer = new AnswerDto
+                {                   
+                    a = q.answer.a,
+                    b = q.answer.b,
+                    c = q.answer.c,
+                    d = q.answer.d
+                },
+                image_url = q.image?.image_url 
+            }).ToList();
+
+            return questionDtos;
         }
+
 
         public async Task<Question> GetQuestionByIdAsync(string questionId)
         {
@@ -42,7 +61,7 @@ namespace ExercisesApi.Repository.QuestionRepo
             _context.questions.Add(question);
             await _context.SaveChangesAsync();
         }
-        public async Task UpdateQuestionAsync(List<UpdateQuestionDto> updateQuestionDtos)
+        public async Task UpdateQuestionAsync(List<CreateQuestionDto> updateQuestionDtos)
         {
             foreach (var updatedQuestion in updateQuestionDtos)
             {
@@ -50,9 +69,9 @@ namespace ExercisesApi.Repository.QuestionRepo
 
                 if (existingQuestion != null)
                 {
-                    existingQuestion.question_content = updatedQuestion.question_content;
-                    existingQuestion.exercise_id = updatedQuestion.exercise_id;
-                    existingQuestion.index = updatedQuestion.index;
+                    existingQuestion.question_content = updatedQuestion.question_content?? existingQuestion.question_content;
+                    existingQuestion.exercise_id = updatedQuestion.exercise_id ?? existingQuestion.exercise_id;
+                    existingQuestion.index = updatedQuestion.index?? existingQuestion.index;
 
                     _context.questions.Update(existingQuestion);
                    

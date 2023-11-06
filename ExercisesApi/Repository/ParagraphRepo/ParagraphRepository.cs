@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ExercisesApi.Data;
-using ExercisesApi.DTO.UpdateExerciseRequest;
+using ExercisesApi.DTO.CreateExerciseDto;
 using ExercisesApi.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,11 +9,9 @@ namespace ExercisesApi.Repository.ParagraphRepo
     public class ParagraphRepository : IParagraphRepository
     {
         private readonly DataContext _context;
-        private readonly IMapper _mapper;
-        public ParagraphRepository(DataContext dataContext, IMapper mapper)
+        public ParagraphRepository(DataContext dataContext)
         {
             _context = dataContext;
-            _mapper = mapper;
         }
         public async Task AddParagraphAsync(Paragraph paragraph)
         {
@@ -43,7 +41,7 @@ namespace ExercisesApi.Repository.ParagraphRepo
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateParagraphsAsync(List<UpdateParagraphDto> updateParagraphDtos)
+        public async Task UpdateParagraphsAsync(List<CreateParagraphDto> updateParagraphDtos)
         {
             foreach (var updateParagraph in updateParagraphDtos)
             {
@@ -51,8 +49,8 @@ namespace ExercisesApi.Repository.ParagraphRepo
 
                 if (existingParagraph != null)
                 {
-                    existingParagraph.paragraph_url = updateParagraph.paragraph_url;
-                    existingParagraph.question_id = updateParagraph.question_id;
+                    existingParagraph.paragraph_url = updateParagraph.paragraph_url ?? existingParagraph.paragraph_url;
+                    existingParagraph.question_id = updateParagraph.question_id?? existingParagraph.question_id;
                     _context.paragraphs.Update(existingParagraph);
                 }
             }

@@ -10,7 +10,7 @@ namespace ExercisesApi.Repository.AnswerRepo
         Task<Answer> GetAnswerByIdAsync(string answerId);
         Task AddAnswersAsync(List<Answer> answers);
         Task AddAnswerAsync(Answer answer);
-        Task UpdateAnswerAsync(List<GetAnswerToUpdateDto> updateAnswerDtos);
+        Task UpdateAnswerAsync(List<CreateAnswerDto> updateAnswerDtos);
         Task DeleteAnswerAsync(string answerId);
     }
 }

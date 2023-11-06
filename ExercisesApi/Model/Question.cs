@@ -18,6 +18,8 @@ namespace ExercisesApi.Model
         public Exercise exercise { get; set; }
         [JsonIgnore]
         public Answer answer { get; set; }
+        [JsonIgnore]
+        public List<ExamResultDetail> examResultDetail { get; set; }
     }
 }
 

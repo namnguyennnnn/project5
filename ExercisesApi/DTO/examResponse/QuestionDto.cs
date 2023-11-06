@@ -1,5 +1,4 @@
-﻿using CloudinaryDotNet.Actions;
-
+﻿
 namespace ExercisesApi.DTO.examResponse
 {
     public class QuestionDto

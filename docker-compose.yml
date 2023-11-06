@@ -1,0 +1,107 @@
+version: '3.4'
+
+networks:
+ backend:
+
+services:
+  database-mysql: 
+    hostname: project-db
+    container_name: toeic-db
+    image: mysql:8.0.34 
+    ports:
+    - 3307:3306
+    restart: always
+    environment: 
+    - MYSQL_ROOT_PASSWORD=123456    
+    expose:
+    - 3306
+    networks:
+    - backend  
+#----------------
+  category-api:
+    container_name: category-service
+    hostname: category
+    image: ${DOCKER_REGISTRY-}categoryapi:latest
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: CategoryApi/Dockerfile
+    environment:
+     DB_HOST: "project-db"
+     DB_NAME: "toeic-db"
+     MYSQL_ROOT_PASSWORD: "123456"
+     DB_PORT: "3306"
+    ports:
+     - 7149:80
+     - 5264:666
+    depends_on:
+    - database-mysql
+    # volumes:
+    # - ${APPDATA}/microsoft/UserSecrets:/root/.microsoft/usersecrets/
+    # - ${USERPROFILE}/.a   spnet/https:/root/.aspnet/https/
+    networks:
+    - backend
+#----------------
+
+  exercises-api:
+    container_name: exercises-service
+    hostname: exercises
+    image: ${DOCKER_REGISTRY-}exercisesapi:latest
+    build:
+      context: .
+      dockerfile: ExercisesApi/Dockerfile
+    restart: unless-stopped
+    environment:
+     DB_HOST: "project-db"
+     DB_NAME: "toeic-db"
+     MYSQL_ROOT_PASSWORD: "123456"
+     DB_PORT: "3306"
+    ports:
+    - 7102:80
+    - 5212:666
+    networks:
+    - backend
+    depends_on:
+    - database-mysql
+#----------------
+  coursesapi:
+    container_name: courses-service
+    hostname: courses
+    image: ${DOCKER_REGISTRY-}coursesapi:latest
+    build:
+      context: .
+      dockerfile: CoursesApi/Dockerfile
+    restart: unless-stopped
+    environment:
+     DB_HOST: "project-db"
+     DB_NAME: "toeic-db"
+     MYSQL_ROOT_PASSWORD: "123456"
+     DB_PORT: "3306"
+    ports:
+    - 7229:80
+    depends_on:
+    - database-mysql
+    networks:
+    - backend
+
+#----------------
+  userapi:
+    container_name: user-service
+    hostname: user
+    image: ${DOCKER_REGISTRY-}userapi
+    build:
+      context: .
+      dockerfile: UserApi/Dockerfile
+    restart: unless-stopped
+    environment:
+     DB_HOST: "project-db"
+     DB_NAME: "toeic-db"
+     MYSQL_ROOT_PASSWORD: "123456"
+     DB_PORT: "3306"
+    ports:
+    - 7116:80
+    - 5263:666 
+    depends_on:
+    - database-mysql
+    networks:
+    - backend

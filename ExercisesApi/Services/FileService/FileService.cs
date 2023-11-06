@@ -1,111 +1,147 @@
-﻿using CloudinaryDotNet.Actions;
-using CloudinaryDotNet;
+﻿
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
+
 
 namespace ExercisesApi.Services.FileService
 {   
     public class FileService: IFileService
     {
-        private readonly Cloudinary _cloudinary;
-
-        public FileService(IConfiguration configuration)
+        private static string BucketName = "toeic-bucket-asp";
+        private readonly StorageClient _storageClient;
+        private readonly GoogleCredential _credential;
+        public FileService()
         {
-            string cloudName = configuration["CloudinarySettings:CloudName"];
-            string apiKey = configuration["CloudinarySettings:ApiKey"];
-            string apiSecret = configuration["CloudinarySettings:ApiSecret"];
+            string credentialPath = "credential.json";
+            GoogleCredential credential = GoogleCredential.FromFile(credentialPath);
+            _credential = credential;
+            _storageClient = StorageClient.Create(credential);
 
-            Account account = new Account(cloudName, apiKey, apiSecret);
-            _cloudinary = new Cloudinary(account);
         }
 
-        public async Task<bool> DeleteFiles(List<string> filePath)
+        public async Task<string> UploadFileAsync(IFormFile file)
         {
-            foreach (var url in filePath)
+            if (file == null || file.Length == 0)
             {
-                string publicId = GetPublicIdFromUrl(url);
-                var deletionResult = await _cloudinary.DeleteResourcesByPrefixAsync(publicId);
-
-                if (deletionResult.Deleted.Count == 0)
-                {
-                    Console.WriteLine($"Xóa tài nguyên không thành công: {url}");
-                    return false;
-                }
-                else
-                {
-                    Console.WriteLine($"Đã xóa tài nguyên: {url}");
-                }
+                return null;
             }
 
-            return true;
-        }
+            string uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
 
-        public async Task<string> SaveFile(IFormFile File)
-        {
-            if (File == null || File.Length == 0)
-            {
-                // Xử lý lỗi khi tệp không hợp lệ.
-                return "Tệp không hợp lệ.";
-            }
+            string folderName = "images";
 
-            string uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(File.FileName)}";
-            var folderName = "images";
-
-            if (Path.GetExtension(File.FileName).Equals(".mp3", StringComparison.OrdinalIgnoreCase))
+            if (Path.GetExtension(file.FileName).Equals(".mp3", StringComparison.OrdinalIgnoreCase))
             {
                 folderName = "audio";
             }
 
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+
+
+                var storageObject = new Google.Apis.Storage.v1.Data.Object
+                {
+                    Bucket = BucketName,
+                    Name = $"{folderName}/{uniqueFileName}"
+                };
+
+                using (var stream = new MemoryStream(memoryStream.ToArray()))
+                {
+                    await _storageClient.UploadObjectAsync(storageObject, stream);
+
+                    // Sử dụng storageObject.Name khi xây dựng đường dẫn
+                    string fileUri = $"https://storage.googleapis.com/{BucketName}/{storageObject.Name}";
+                    return fileUri;
+                }
+            }
+        }
+
+        public async Task<string> UploadImageByDataAsync(byte[] imageData)
+        {
+            if (imageData == null || imageData.Length == 0)
+            {
+                return null;
+            }
+
+            string uniqueFileName = $"{Guid.NewGuid()}.jpg"; // Tạo một tên tệp ngẫu nhiên với phần mở rộng .jpg (hoặc .png, .jpeg, tùy bạn)
+            string folderName = "images";
+
+            using (var memoryStream = new MemoryStream(imageData))
+            {
+                var storageObject = new Google.Apis.Storage.v1.Data.Object
+                {
+                    Bucket = BucketName,
+                    Name = $"{folderName}/{uniqueFileName}"
+                };
+
+                await _storageClient.UploadObjectAsync(storageObject, memoryStream);
+
+                // Sử dụng storageObject.Name khi xây dựng đường dẫn
+                string fileUri = $"https://storage.googleapis.com/{BucketName}/{storageObject.Name}";
+                return fileUri;
+            }
+        }
+
+        public async Task<string> UploadAudioByDataAsync(byte[] audioData)
+        {
+            if (audioData == null || audioData.Length == 0)
+            {
+                return null;
+            }
+
+            string uniqueFileName = $"{Guid.NewGuid()}.mp3"; // Tạo một tên tệp ngẫu nhiên với phần mở rộng .mp3
+            string folderName = "audio";
+
+            using (var memoryStream = new MemoryStream(audioData))
+            {
+                var storageObject = new Google.Apis.Storage.v1.Data.Object
+                {
+                    Bucket = BucketName,
+                    Name = $"{folderName}/{uniqueFileName}"
+                };
+
+                await _storageClient.UploadObjectAsync(storageObject, memoryStream);
+
+                // Sử dụng storageObject.Name khi xây dựng đường dẫn
+                string fileUri = $"https://storage.googleapis.com/{BucketName}/{storageObject.Name}";
+                return fileUri;
+            }
+        }
+
+        public async Task<string> GetSignedUrl(string fileUri)
+        {
             try
             {
-                using (var memoryStream = new MemoryStream())
+                var sac = _credential.UnderlyingCredential as ServiceAccountCredential;
+                var urlSigner = UrlSigner.FromServiceAccountCredential(sac);
+          
+                var fileName = fileUri.Replace($"https://storage.googleapis.com/{BucketName}/", "");
+
+                var signedUrl = await urlSigner.SignAsync(BucketName, fileName, TimeSpan.FromHours(6));
+                return signedUrl.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task DeleteFilesAsync(IEnumerable<string> fileUris)
+        {
+            try
+            {
+                foreach (var fileUri in fileUris)
                 {
-                    await File.CopyToAsync(memoryStream);
-                    memoryStream.Position = 0;
-
-                    var uploadParams = new RawUploadParams
-                    {
-                        File = new FileDescription(uniqueFileName, memoryStream),
-                        PublicId = $"{folderName}/{uniqueFileName}"
-                    };
-
-                    var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
-                    return uploadResult.SecureUri.ToString();
+                    var fileName = fileUri.Replace($"https://storage.googleapis.com/{BucketName}/", "");
+                    await _storageClient.DeleteObjectAsync(BucketName, fileName);
                 }
             }
             catch (Exception ex)
             {
-                
-                return $"Lỗi khi tải lên: {ex.Message}";
-            }
-            finally
-            {
-                
-                File = null;
+                throw new Exception("Error deleting files: " + ex.Message, ex);
             }
         }
 
-        public async Task<List<string>> SaveMultipleFiles(List<IFormFile> files)
-        {
-            var fileUrls = new List<string>();
-
-            foreach (var file in files)
-            {
-                var result = await SaveFile(file);
-                if (!string.IsNullOrEmpty(result))
-                {
-                    fileUrls.Add(result);
-                }
-            }
-
-            return fileUrls;
-        }
-
-        private string GetPublicIdFromUrl(string url)
-        {
-            // Trích xuất public ID từ URL Cloudinary
-            Uri uri = new Uri(url);
-            string publicId = uri.Segments.Last().Split('.')[0];
-            return publicId;
-        }
     }
 }

@@ -1,10 +1,14 @@
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\appsettings.Development.json
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\appsettings.json
+D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\appsettings.Production.json
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\UserApi.exe
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\UserApi.deps.json
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\UserApi.runtimeconfig.json
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\UserApi.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\UserApi.pdb
+D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\AutoMapper.dll
+D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\CloudinaryDotNet.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\Google.Protobuf.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\Grpc.AspNetCore.Server.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\Grpc.AspNetCore.Server.ClientFactory.dll
@@ -26,6 +30,7 @@ D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\Microsoft.OpenApi.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\MySql.Data.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\MySql.EntityFrameworkCore.dll
+D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\Newtonsoft.Json.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\BouncyCastle.Crypto.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll
 D:\hoctap\LuanVan\UserApi\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerGen.dll

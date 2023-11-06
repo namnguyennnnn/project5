@@ -17,7 +17,7 @@ namespace ExercisesApi.Services.AudioService
 
         public async Task CreateAudio(CreateAudioDto audioDto, string exerciseId)
         {
-            var filepath = await _fileService.SaveFile(audioDto.audio_url);
+            var filepath = await _fileService.UploadFileAsync(audioDto.audioFile);
 
             var newAudio = new Audio
             { 
@@ -32,7 +32,22 @@ namespace ExercisesApi.Services.AudioService
             await _audioRepository.AddAudioAsync(newAudio);
         }
 
-       
+        public async Task CreateAudioByDataFile(CreateAudioDto audioDto, string exerciseId)
+        {
+            var filepath = await _fileService.UploadAudioByDataAsync(audioDto.audioData);
+
+            var newAudio = new Audio
+            {
+                audio_id = exerciseId,
+                audio_url = filepath,
+                part1 = audioDto.part1,
+                part2 = audioDto.part2,
+                part3 = audioDto.part3,
+                part4 = audioDto.part4,
+                exercise_id = exerciseId
+            };
+            await _audioRepository.AddAudioAsync(newAudio);
+        }
     }
     
 }

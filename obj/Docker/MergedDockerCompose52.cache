@@ -1,0 +1,129 @@
+name: dockercompose5720751359991469149
+services:
+  category-api:
+    build:
+      context: D:\hoctap\LuanVan
+      dockerfile: CategoryApi/Dockerfile
+    container_name: category-service
+    depends_on:
+      database-mysql:
+        condition: service_started
+        required: true
+    environment:
+      DB_HOST: project-db
+      DB_NAME: toeic-db
+      DB_PORT: "3306"
+      MYSQL_ROOT_PASSWORD: "123456"
+    hostname: category
+    image: categoryapi:latest
+    networks:
+      backend: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "7149"
+      protocol: tcp
+    - mode: ingress
+      target: 666
+      published: "5264"
+      protocol: tcp
+    restart: unless-stopped
+  coursesapi:
+    build:
+      context: D:\hoctap\LuanVan
+      dockerfile: CoursesApi/Dockerfile
+    container_name: courses-service
+    depends_on:
+      database-mysql:
+        condition: service_started
+        required: true
+    environment:
+      DB_HOST: project-db
+      DB_NAME: toeic-db
+      DB_PORT: "3306"
+      MYSQL_ROOT_PASSWORD: "123456"
+    hostname: courses
+    image: coursesapi:latest
+    networks:
+      backend: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "7229"
+      protocol: tcp
+    restart: unless-stopped
+  database-mysql:
+    container_name: toeic-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    expose:
+    - "3306"
+    hostname: project-db
+    image: mysql:8.0.34
+    networks:
+      backend: null
+    ports:
+    - mode: ingress
+      target: 3306
+      published: "3307"
+      protocol: tcp
+    restart: always
+  exercises-api:
+    build:
+      context: D:\hoctap\LuanVan
+      dockerfile: ExercisesApi/Dockerfile
+    container_name: exercises-service
+    depends_on:
+      database-mysql:
+        condition: service_started
+        required: true
+    environment:
+      DB_HOST: project-db
+      DB_NAME: toeic-db
+      DB_PORT: "3306"
+      MYSQL_ROOT_PASSWORD: "123456"
+    hostname: exercises
+    image: exercisesapi:latest
+    networks:
+      backend: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "7102"
+      protocol: tcp
+    - mode: ingress
+      target: 666
+      published: "5212"
+      protocol: tcp
+    restart: unless-stopped
+  userapi:
+    build:
+      context: D:\hoctap\LuanVan
+      dockerfile: UserApi/Dockerfile
+    container_name: user-service
+    depends_on:
+      database-mysql:
+        condition: service_started
+        required: true
+    environment:
+      DB_HOST: project-db
+      DB_NAME: toeic-db
+      DB_PORT: "3306"
+      MYSQL_ROOT_PASSWORD: "123456"
+    hostname: user
+    image: userapi
+    networks:
+      backend: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "7116"
+      protocol: tcp
+    - mode: ingress
+      target: 666
+      published: "5263"
+      protocol: tcp
+    restart: unless-stopped
+networks:
+  backend:
+    name: dockercompose5720751359991469149_backend

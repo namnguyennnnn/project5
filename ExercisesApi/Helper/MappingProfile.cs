@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using ExercisesApi.DTO;
-using ExercisesApi.DTO.GetInfoExerciseToUpdateDto;
-using ExercisesApi.DTO.UpdateExerciseRequest;
 using ExercisesApi.Model;
 
 namespace ExercisesApi.Helper
@@ -13,7 +11,10 @@ namespace ExercisesApi.Helper
         {
             CreateMap<Exercise, ExerciseInfo>();
             CreateMap<ExerciseInfo, Exercise>();
+            CreateMap<CreateExamResultDto, ExamResult>().ReverseMap();
             
+
+            CreateMap<CreateExamResultDetailDto,ExamResultDetail>().ReverseMap();
         }
 
     }
